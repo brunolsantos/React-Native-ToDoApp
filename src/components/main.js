@@ -5,7 +5,8 @@ import {
     StyleSheet,
     TextInput,
     ScrollView,
-    TouchableOpacity
+    TouchableOpacity,
+    AsyncStorage
 } from 'react-native';
 
 import Note from './note';
@@ -19,6 +20,17 @@ export default class Main extends Component {
             noteText: '',
         };
     }
+    
+    //saving state from previous use
+    componentWillMount =()=> {
+       AsyncStorage.getItem("todos")
+       .then((value) => {
+            if (value) {
+              this.setState({noteArray: JSON.parse(value)});
+            }
+       });
+    }
+    
     render() {
         let notes = this.state.noteArray.map((val, key)=>{
             return <Note key={key} keyval={key} val={val}
@@ -61,12 +73,14 @@ export default class Main extends Component {
             });
             this.setState({ noteArray: this.state.noteArray });
             this.setState({noteText:''});
+            AsyncStorage.setItem("todos",JSON.stringify(this.state.noteArray));
         }
     }
 
     deleteNote(key){
         this.state.noteArray.splice(key, 1);
         this.setState({noteArray: this.state.noteArray});
+        AsyncStorage.setItem("todos",JSON.stringify(this.state.noteArray));
     }
 }
 
